@@ -1,3 +1,6 @@
+# Analysis
+Code comments for pyopenjtalk Analysis/Understanding are commited into [`analysis` branch](https://github.com/tarepan/pyopenjtalk/tree/analysis).
+
 # pyopenjtalk
 
 [![PyPI](https://img.shields.io/pypi/v/pyopenjtalk.svg)](https://pypi.python.org/pypi/pyopenjtalk)
