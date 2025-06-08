@@ -10,41 +10,18 @@ Text-processing Frontend of [Open JTalk](http://open-jtalk.sp.nitech.ac.jp/), wr
 
 Before using the pyopenjtalk package, please have a look at the LICENSE for the software.
 
-## Build requirements
-
-The python package relies on cython to make python bindings for open_jtalk. You must need the following tools to build and install pyopenjtalk:
-
-- C/C++ compilers (to build C/C++ extentions)
-- cmake
-- cython
-
 ## Supported platforms
 
 - Linux
 - Mac OSX
 - Windows (MSVC) (see [this PR](https://github.com/r9y9/pyopenjtalk/pull/13))
 
-## Installation
+## How to Use
+### Installation
 
 ```
 pip install pyopenjtalk
 ```
-
-## Development
-
-To build the package locally, you will need to make sure to clone open_jtalk.
-
-```
-git submodule update --recursive --init
-```
-
-and then run
-
-```
-pip install -e .
-```
-
-## How to Use
 
 ### Grapheme-to-Tree (G2Tree)
 WIP
@@ -121,3 +98,23 @@ In [2]: label = pyopenjtalk.run_frontend("こんにちは", run_marine=True) # f
 ## Acknowledgements
 
 HTS Working Group for their dedicated efforts to develop and maintain Open JTalk.
+
+## Development
+
+## Requirements
+Following tools are needed for build:
+
+- C/C++ compilers
+- cmake
+- cython
+
+To build the package locally, you will need to make sure to clone open_jtalk.
+
+```
+git submodule update --recursive --init
+```
+
+### Build
+```
+pip install -e .
+```

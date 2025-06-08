@@ -5,7 +5,6 @@ from glob import glob
 from itertools import chain
 from os.path import exists, join
 
-import numpy as np
 import setuptools.command.build_ext
 from setuptools import Extension, setup
 
