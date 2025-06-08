@@ -11,7 +11,8 @@ from collections.abc import Callable, Generator
 from contextlib import ExitStack, contextmanager
 from os.path import exists
 from threading import Lock
-from typing import TypeVar
+from typing import TypeVar, TypedDict
+
 from urllib.request import urlopen
 
 if sys.version_info >= (3, 9):
@@ -118,26 +119,43 @@ _global_jtalk = _global_instance_manager(_jtalk_factory)
 _global_marine = _global_instance_manager(_marine_factory)
 
 
-def g2p(*args, **kwargs) -> str | list[str]:
+class OjtNjdFeature(TypedDict):
+    """Open JTalk NJD feature."""
+
+    string: str
+    pos: str
+    pos_group1: str
+    pos_group2: str
+    pos_group3: str
+    ctype: str
+    cform: str
+    orig: str
+    read: str
+    pron: str
+    acc: int
+    mora_size: int
+    chain_rule: str
+    chain_flag: int
+
+
+def g2p(text: str, kana: bool = False, join: bool = True) -> str | list[str]:
     """Grapheme-to-phoeneme (G2P) conversion.
 
     This is just a convenient wrapper around `run_frontend`.
 
     Args:
-        text (str): Unicode Japanese text.
-        kana (bool): If True, returns the pronunciation in katakana, otherwise in phone.
-          Default is False.
-        join (bool): If True, concatenate phones or katakana's into a single string.
-          Default is True.
+        text: Unicode Japanese text.
+        kana: If True, returns the pronunciation in katakana, otherwise in phone.
+        join: If True, concatenate phones or katakana's into a single string.
 
     Returns:
         G2P results. Joined string or list of symbols.
     """
     with _global_jtalk() as jtalk:
-        return jtalk.g2p(*args, **kwargs)
+        return jtalk.g2p(text, kana=kana, join=join)
 
 
-def estimate_accent(njd_features):
+def estimate_accent(njd_features: list[OjtNjdFeature]) -> list[OjtNjdFeature]:
     """Accent estimation using marine.
 
     This function requires marine (https://github.com/6gsn/marine)
@@ -159,7 +177,7 @@ def estimate_accent(njd_features):
     return njd_features
 
 
-def run_frontend(text: str, run_marine: bool = False):
+def run_frontend(text: str, run_marine: bool = False) -> list[OjtNjdFeature]:
     """Run OpenJTalk's text processing frontend.
 
     Args:
@@ -168,7 +186,7 @@ def run_frontend(text: str, run_marine: bool = False):
           When use, need to install marine by `pip install pyopenjtalk[marine]`.
 
     Returns:
-        list: features for NJDNode.
+        features for NJDNode.
     """
     with _global_jtalk() as jtalk:
         njd_features = jtalk.run_frontend(text)
