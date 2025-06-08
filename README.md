@@ -121,6 +121,8 @@ Removed features are listed below:
 - `pyopenjtalk.extract_fullcontext()`
 - `pyopenjtalk.make_label()`
 - `pyopenjtalk.estimate_accent()`
+- Notebooks
+- Docs
 
 If you want to use [MARINE](https://github.com/6gsn/marine) for accent refinement, you can use it with `.run_frontend()` and custom parser (check [pyopenjtalk codes](https://github.com/r9y9/pyopenjtalk/blob/0f0fc44e782a8134cd9a51d80b57b48a7c95bb80/pyopenjtalk/__init__.py#L140-L159)).  
 

@@ -37,14 +37,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-docs = [
-    "sphinx_rtd_theme",
-    "nbsphinx>=0.8.6",
-    "Jinja2>=3.0.1",
-    "pandoc",
-    "ipython",
-    "jupyter",
-]
 dev = [
     "cython>=0.29.16",
     "mypy>=1.16.0",
@@ -65,11 +57,6 @@ version_file_template = '''
 __version__ = "{version}"
 '''
 # local_scheme = "no-local-version"
-
-[tool.ruff]
-extend-exclude = [
-  "docs/conf.py", # Because this file is python-like non-standalone config.
-]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -101,5 +88,4 @@ docstring-code-format = true
 strict = true
 exclude = [
   "build",
-  "docs/conf.py", # Because this file is python-like non-standalone config.
 ]
