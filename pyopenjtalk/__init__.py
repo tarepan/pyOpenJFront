@@ -14,11 +14,7 @@ from threading import Lock
 from typing import TypeVar, TypedDict
 
 from urllib.request import urlopen
-
-if sys.version_info >= (3, 9):
-    from importlib.resources import as_file, files
-else:
-    from importlib_resources import as_file, files
+from importlib.resources import as_file, files
 
 try:
     from .version import __version__  # NOQA
