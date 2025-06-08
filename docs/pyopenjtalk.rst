@@ -16,12 +16,10 @@ High-level API
 --------------
 
 .. autofunction:: g2p
-.. autofunction:: extract_fullcontext
 
 
 Misc
 ----
 
 .. autofunction:: run_frontend
-.. autofunction:: make_label
 .. autofunction:: estimate_accent

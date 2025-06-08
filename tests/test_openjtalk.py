@@ -4,19 +4,11 @@ from pathlib import Path
 import pyopenjtalk
 
 
-def _print_results(njd_features, labels):
+def test_hello():
+    njd_features = pyopenjtalk.run_frontend("こんにちは")
     for f in njd_features:
         s, p = f["string"], f["pron"]
         print(s, p)
-
-    for label in labels:
-        print(label)
-
-
-def test_hello():
-    njd_features = pyopenjtalk.run_frontend("こんにちは")
-    labels = pyopenjtalk.make_label(njd_features)
-    _print_results(njd_features, labels)
 
 
 def test_njd_features():
@@ -42,14 +34,6 @@ def test_njd_features():
     assert njd_features == expected_feature
 
 
-def test_fullcontext():
-    features = pyopenjtalk.run_frontend("こんにちは")
-    labels = pyopenjtalk.make_label(features)
-    labels2 = pyopenjtalk.extract_fullcontext("こんにちは")
-    for a, b in zip(labels, labels2):
-        assert a == b
-
-
 def test_jtalk():
     for text in [
         "今日も良い天気ですね",
@@ -58,8 +42,9 @@ def test_jtalk():
         "パソコンのとりあえず知っておきたい使い方",
     ]:
         njd_features = pyopenjtalk.run_frontend(text)
-        labels = pyopenjtalk.make_label(njd_features)
-        _print_results(njd_features, labels)
+        for f in njd_features:
+            s, p = f["string"], f["pron"]
+            print(s, p)
 
         surface = "".join(map(lambda f: f["string"], njd_features))
         assert surface == text

@@ -226,7 +226,7 @@ cdef class OpenJTalk:
         return features
 
     @_lock_manager()
-    def make_label(self, features):
+    def _make_label(self, features):
         """Make full-context label
         """
         feature2njd(self.njd, features)
@@ -256,7 +256,7 @@ cdef class OpenJTalk:
         njd_features = self.run_frontend(text)
 
         if not kana:
-            labels = self.make_label(njd_features)
+            labels = self._make_label(njd_features)
             prons = list(map(lambda s: s.split("-")[1].split("+")[0], labels[1:-1]))
             if join:
                 prons = " ".join(prons)

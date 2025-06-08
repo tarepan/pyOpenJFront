@@ -148,25 +148,6 @@ def estimate_accent(njd_features):
     return njd_features
 
 
-def extract_fullcontext(text, run_marine=False):
-    """Extract full-context labels from text
-
-    Args:
-        text (str): Input text
-        run_marine (bool): Whether to estimate accent using marine.
-          Default is False. If you want to activate this option, you need to install marine
-          by `pip install pyopenjtalk[marine]`
-
-    Returns:
-        list: List of full-context labels
-    """
-
-    njd_features = run_frontend(text)
-    if run_marine:
-        njd_features = estimate_accent(njd_features)
-    return make_label(njd_features)
-
-
 def run_frontend(text: str, run_marine: bool = False):
     """Run OpenJTalk's text processing frontend
 
@@ -184,19 +165,6 @@ def run_frontend(text: str, run_marine: bool = False):
         # TODO: Test here
         njd_features = estimate_accent(njd_features)
     return njd_features
-
-
-def make_label(njd_features):
-    """Make full-context label using features
-
-    Args:
-        njd_features (list): features for NJDNode.
-
-    Returns:
-        list: full-context labels.
-    """
-    with _global_jtalk() as jtalk:
-        return jtalk.make_label(njd_features)
 
 
 def mecab_dict_index(path, out_path, dn_mecab=None):
