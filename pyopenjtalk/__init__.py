@@ -111,9 +111,6 @@ def _marine_factory():
 
 # Global instance of OpenJTalk
 _global_jtalk = _global_instance_manager(_jtalk_factory)
-# Global instance of HTSEngine
-# mei_normal.voice is used as default
-_global_htsengine = _global_instance_manager(lambda: HTSEngine(DEFAULT_HTS_VOICE))
 # Global instance of Marine
 _global_marine = _global_instance_manager(_marine_factory)
 
@@ -176,28 +173,6 @@ def extract_fullcontext(text, run_marine=False):
     if run_marine:
         njd_features = estimate_accent(njd_features)
     return make_label(njd_features)
-
-
-def synthesize(labels, speed=1.0, half_tone=0.0):
-    """Run OpenJTalk's speech synthesis backend
-
-    Args:
-        labels (list): Full-context labels
-        speed (float): speech speed rate. Default is 1.0.
-        half_tone (float): additional half-tone. Default is 0.
-
-    Returns:
-        np.ndarray: speech waveform (dtype: np.float64)
-        int: sampling frequency (defualt: 48000)
-    """
-    if isinstance(labels, tuple) and len(labels) == 2:
-        labels = labels[1]
-
-    with _global_htsengine() as htsengine:
-        sr = htsengine.get_sampling_frequency()
-        htsengine.set_speed(speed)
-        htsengine.add_half_tone(half_tone)
-        return htsengine.synthesize(labels), sr
 
 
 def run_frontend(text):

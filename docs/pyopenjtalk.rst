@@ -17,7 +17,6 @@ High-level API
 
 .. autofunction:: g2p
 .. autofunction:: extract_fullcontext
-.. autofunction:: synthesize
 
 
 Misc
