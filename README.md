@@ -1,20 +1,12 @@
-# pyOpenJFront
+<div align="center">
+
+# 📃 pyOpenJFront 🔡 <!-- omit in toc -->
 
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
 
-Text-processing Frontend of [Open JTalk](http://open-jtalk.sp.nitech.ac.jp/), wrapped by Python.
-
-## Notice
-
-- The package is built with the [modified version of OpenJTalk](https://github.com/r9y9/open_jtalk). The modified version provides the same functionality with some improvements (e.g., cmake support) but is technically different from the one from HTS working group.
-
-Before using the pyopenjtalk package, please have a look at the LICENSE for the software.
-
-## Supported platforms
-
-- Linux
-- Mac OSX
-- Windows (MSVC) (see [this PR](https://github.com/r9y9/pyopenjtalk/pull/13))
+Simple-and-Modern Text-processing Frontend of [Open JTalk](http://open-jtalk.sp.nitech.ac.jp/), wrapped by Python.  
+シンプルかつモダンな Open JTalk テキスト分析フロントエンドの Python ラッパー
+</div>
 
 ## How to Use
 ### Installation
@@ -88,6 +80,21 @@ In [1]: import pyopenjtalk
 In [2]: label = pyopenjtalk.run_frontend("こんにちは", run_marine=True) # for text processing frontend only
 ```
 
+## APIs
+- `pyopenjtalk.g2p(text: str, kana: bool = False, join: bool = True) -> str | list[str]`: Grapheme-to-phoeneme conversion.
+  - `kana`: If True, returns the pronunciation in katakana, otherwise in phone.
+  - `join`: If True, concatenate phones or katakana's into a single string.
+- `pyopenjtalk.estimate_accent(njd_features: list[OjtNjdFeature]) -> list[OjtNjdFeature]`
+- `pyopenjtalk.run_frontend(text: str, run_marine: bool = False) -> list[OjtNjdFeature]`: Run OpenJTalk's text processing frontend.
+  - `run_marine`: Whether to estimate accent using marine.
+- `pyopenjtalk.mecab_dict_index(path: str, out_path: str, dn_mecab: str | None = None) -> None`: Create user dictionary.
+- `pyopenjtalk.update_global_jtalk_with_user_dict(path: str) -> None`: Update global openjtalk instance with the user dictionary.
+
+## Supported platforms
+
+- Linux
+- Mac OSX
+- Windows (MSVC) (see [this PR](https://github.com/r9y9/pyopenjtalk/pull/13))
 
 ## LICENSE
 
@@ -118,3 +125,26 @@ git submodule update --recursive --init
 ```
 pip install -e .
 ```
+
+### Test
+```
+pytest
+```
+
+## Differences from pyopenjtalk
+pyOpenJFront is simplified and modernized version of `pyopenjtalk`.  
+
+Removed features are listed below:  
+
+- `pyopenjtalk.tts()`
+- `pyopenjtalk.synthesize()`
+- `pyopenjtalk.extract_fullcontext()`
+- `pyopenjtalk.make_label()`
+- Notebooks
+
+New featues are listed below:
+
+- Full type hints
+- MARINE option in `run_frontend()` (could be removed)
+
+If you needs more-rich-feature pyopenjtalk, [`pyopenjtalk-plus`](https://github.com/tsukumijima/pyopenjtalk-plus) will help you 😉
