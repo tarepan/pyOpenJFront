@@ -145,13 +145,15 @@ def mecab_dict_index(path: str, out_path: str, dn_mecab: str | None = None) -> N
         msg = f"no such file or directory: {path}"
         raise FileNotFoundError(msg)
 
+    _dn_mecab: bytes
     if dn_mecab is None:
         # NOTE: Prepare the dictionary through `_lazy_init()` call
         with _global_jtalk():
             pass
-        dn_mecab = OPEN_JTALK_DICT_DIR
-
-    r = _mecab_dict_index(dn_mecab, path.encode("utf-8"), out_path.encode("utf-8"))
+        _dn_mecab = OPEN_JTALK_DICT_DIR
+    else:
+        _dn_mecab = dn_mecab.encode("utf-8")
+    r = _mecab_dict_index(_dn_mecab, path.encode("utf-8"), out_path.encode("utf-8"))
     # NOTE: mecab load returns 1 if success, but mecab_dict_index return the opposite
     if r != 0:
         msg = "Failed to create user dictionary"
