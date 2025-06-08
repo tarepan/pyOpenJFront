@@ -15,7 +15,6 @@ The functional interface for text processing and waveform synthesis.
 High-level API
 --------------
 
-.. autofunction:: tts
 .. autofunction:: g2p
 .. autofunction:: extract_fullcontext
 .. autofunction:: synthesize
