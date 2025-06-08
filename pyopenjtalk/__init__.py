@@ -22,7 +22,6 @@ try:
 except ImportError:
     raise ImportError("BUG: version.py doesn't exist. Please file a bug report.")
 
-from .htsengine import HTSEngine
 from .openjtalk import OpenJTalk
 from .openjtalk import mecab_dict_index as _mecab_dict_index
 from .utils import merge_njd_marine_features
@@ -41,13 +40,6 @@ OPEN_JTALK_DICT_DIR = os.environ.get(
 ).encode("utf-8")
 _dict_download_url = "https://github.com/r9y9/open_jtalk/releases/download/v1.11.1"
 _DICT_URL = f"{_dict_download_url}/open_jtalk_dic_utf_8-1.11.tar.gz"
-
-# Default mei_normal.voice for HMM-based TTS
-DEFAULT_HTS_VOICE = str(
-    _file_manager.enter_context(
-        as_file(_pyopenjtalk_ref / "htsvoice/mei_normal.htsvoice")
-    )
-).encode("utf-8")
 
 
 def _extract_dic():

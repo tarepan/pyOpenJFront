@@ -145,23 +145,4 @@ ext_modules = [
     )
 ]
 
-# Extension for HTSEngine backend
-htsengine_src_top = join("lib", "hts_engine_API", "src")
-all_htsengine_src = glob(join(htsengine_src_top, "lib", "*.c"))
-ext_modules += [
-    Extension(
-        name="pyopenjtalk.htsengine",
-        sources=[join("pyopenjtalk", "htsengine.pyx")] + all_htsengine_src,
-        include_dirs=[np.get_include(), join(htsengine_src_top, "include")],
-        extra_compile_args=[],
-        extra_link_args=[],
-        libraries=["winmm"] if platform_is_windows else [],
-        language="c++",
-        define_macros=[
-            ("AUDIO_PLAY_NONE", None),
-            ("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION"),
-        ],
-    )
-]
-
 setup(ext_modules=ext_modules, cmdclass={"build_ext": custom_build_ext})

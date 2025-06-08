@@ -1,31 +1,18 @@
-# Analysis
-Code comments for pyopenjtalk Analysis/Understanding are commited into [`analysis` branch](https://github.com/tarepan/pyopenjtalk/tree/analysis).
+# pyOpenJFront
 
-# pyopenjtalk
-
-[![PyPI](https://img.shields.io/pypi/v/pyopenjtalk.svg)](https://pypi.python.org/pypi/pyopenjtalk)
-[![Python package](https://github.com/r9y9/pyopenjtalk/actions/workflows/ci.yaml/badge.svg)](https://github.com/r9y9/pyopenjtalk/actions/workflows/ci.yaml)
-[![Build Status](https://app.travis-ci.com/r9y9/pyopenjtalk.svg?branch=master)](https://app.travis-ci.com/r9y9/pyopenjtalk)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE.md)
-[![DOI](https://zenodo.org/badge/143748865.svg)](https://zenodo.org/badge/latestdoi/143748865)
 
-A python wrapper for [OpenJTalk](http://open-jtalk.sp.nitech.ac.jp/).
-
-The package consists of two core components:
-
-- Text processing frontend based on OpenJTalk
-- Speech synthesis backend using HTSEngine
+Text-processing Frontend of [Open JTalk](http://open-jtalk.sp.nitech.ac.jp/), wrapped by Python.
 
 ## Notice
 
 - The package is built with the [modified version of OpenJTalk](https://github.com/r9y9/open_jtalk). The modified version provides the same functionality with some improvements (e.g., cmake support) but is technically different from the one from HTS working group.
-- The package also uses the [modified version of hts_engine_API](https://github.com/r9y9/hts_engine_API). The same applies as above.
 
-Before using the pyopenjtalk package, please have a look at the LICENSE for the two software.
+Before using the pyopenjtalk package, please have a look at the LICENSE for the software.
 
 ## Build requirements
 
-The python package relies on cython to make python bindings for open_jtalk and hts_engine_API. You must need the following tools to build and install pyopenjtalk:
+The python package relies on cython to make python bindings for open_jtalk. You must need the following tools to build and install pyopenjtalk:
 
 - C/C++ compilers (to build C/C++ extentions)
 - cmake
@@ -45,7 +32,7 @@ pip install pyopenjtalk
 
 ## Development
 
-To build the package locally, you will need to make sure to clone open_jtalk and hts_engine_API.
+To build the package locally, you will need to make sure to clone open_jtalk.
 
 ```
 git submodule update --recursive --init
@@ -60,18 +47,6 @@ pip install -e .
 ## Quick demo
 
 Please check the notebook version [here (nbviewer)](https://nbviewer.jupyter.org/github/r9y9/pyopenjtalk/blob/master/docs/notebooks/Demo.ipynb).
-
-### TTS
-
-```py
-In [1]: import pyopenjtalk
-
-In [2]: from scipy.io import wavfile
-
-In [3]: x, sr = pyopenjtalk.tts("おめでとうございます")
-
-In [4]: wavfile.write("test.wav", sr, x.astype(np.int16))
-```
 
 ### Run text processing frontend only
 
@@ -153,9 +128,7 @@ And then, you can use the option as the following examples;
 ```python
 In [1]: import pyopenjtalk
 
-In [2]: x, sr = pyopenjtalk.tts("おめでとうございます", run_marine=True) # for TTS
-
-In [3]: label = pyopenjtalk.extract_fullcontext("こんにちは", run_marine=True) # for text processing frontend only
+In [2]: label = pyopenjtalk.extract_fullcontext("こんにちは", run_marine=True) # for text processing frontend only
 ```
 
 
@@ -163,7 +136,6 @@ In [3]: label = pyopenjtalk.extract_fullcontext("こんにちは", run_marine=Tr
 
 - pyopenjtalk: MIT license ([LICENSE.md](LICENSE.md))
 - Open JTalk: Modified BSD license ([COPYING](https://github.com/r9y9/open_jtalk/blob/1.10/src/COPYING))
-- htsvoice in this repository: Please check [pyopenjtalk/htsvoice/README.md](pyopenjtalk/htsvoice/README.md).
 - marine: Apache 2.0 license ([LICENSE](https://github.com/6gsn/marine/blob/main/LICENSE))
 
 ## Acknowledgements

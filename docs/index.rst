@@ -10,7 +10,6 @@ A python wrapper for `OpenJTalk <https://github.com/r9y9/open_jtalk>`_.
 The package consists of two core components:
 
 - Text processing frontend based on OpenJTalk
-- Speech synthesis backend using HTSEngine
 
 https://github.com/r9y9/pyopenjtalk
 
@@ -56,7 +55,6 @@ Please check the usage through the demo notebook.
 
   pyopenjtalk
   openjtalk
-  htsengine
 
 .. toctree::
     :maxdepth: 1
