@@ -6,12 +6,13 @@ import os
 import tarfile
 import tempfile
 from collections.abc import Callable, Generator
-from contextlib import ExitStack, contextmanager
+from contextlib import AbstractContextManager, ExitStack, contextmanager
 from importlib.resources import as_file, files
 from pathlib import Path
 from threading import Lock
-from typing import TypedDict
 from urllib.request import urlopen
+
+from .structures import OjtNjdFeature
 
 try:
     from .version import __version__  # noqa: F401, false-positive
@@ -66,7 +67,7 @@ def _extract_dic() -> None:
 
 def _global_instance_manager(
     instance: OpenJTalk | None,
-) -> Callable[[], Generator[OpenJTalk, None, None]]:
+) -> Callable[[], AbstractContextManager[OpenJTalk]]:
     """Generate an instance manager, which enable singleton-like global instance."""
     _instance = instance
     mutex = Lock()
@@ -86,25 +87,6 @@ def _global_instance_manager(
 
 # Global instance of OpenJTalk
 _global_jtalk = _global_instance_manager(None)
-
-
-class OjtNjdFeature(TypedDict):
-    """Open JTalk NJD feature."""
-
-    string: str
-    pos: str
-    pos_group1: str
-    pos_group2: str
-    pos_group3: str
-    ctype: str
-    cform: str
-    orig: str
-    read: str
-    pron: str
-    acc: int
-    mora_size: int
-    chain_rule: str
-    chain_flag: int
 
 
 def g2p(text: str, *, kana: bool = False, join: bool = True) -> str | list[str]:

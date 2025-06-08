@@ -47,9 +47,10 @@ docs = [
 ]
 dev = [
     "cython>=0.29.16",
+    "mypy>=1.16.0",
     "types-setuptools",
-    "mypy<=0.910",
     "types-decorator",
+    "types-tqdm",
     "importlib-metadata<5.0",
 ]
 test = ["pytest"]
@@ -97,3 +98,6 @@ convention = "numpy"
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.mypy]
+strict = true

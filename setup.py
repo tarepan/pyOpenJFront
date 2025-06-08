@@ -6,7 +6,7 @@ import subprocess
 import sys
 from itertools import chain
 from pathlib import Path
-from typing import Final
+from typing import Final, Literal
 
 import setuptools.command.build_ext
 from setuptools import Extension, setup
@@ -61,7 +61,7 @@ class custom_build_ext(setuptools.command.build_ext.build_ext):  # noqa: N801
         setuptools.command.build_ext.build_ext.build_extensions(self)
 
 
-def _check_cmake_in_path() -> tuple[True, str] | tuple[False, None]:
+def _check_cmake_in_path() -> tuple[Literal[True], str] | tuple[Literal[False], None]:
     try:
         result = subprocess.run(
             ["cmake", "--version"], capture_output=True, text=True, check=False
