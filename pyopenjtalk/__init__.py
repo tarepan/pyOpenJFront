@@ -10,7 +10,7 @@ from contextlib import ExitStack, contextmanager
 from importlib.resources import as_file, files
 from pathlib import Path
 from threading import Lock
-from typing import TypedDict, TypeVar
+from typing import TypedDict
 from urllib.request import urlopen
 
 try:
@@ -64,45 +64,26 @@ def _extract_dic() -> None:
     OPEN_JTALK_DICT_DIR = str(pyopenjtalk_dir / _dic_dir_name).encode("utf-8")
 
 
-def _lazy_init() -> None:
-    """Prepare the dictionary."""
-    if not Path(str(OPEN_JTALK_DICT_DIR)).exists():
-        _extract_dic()
-
-
-_T = TypeVar("_T")
-
-
-def _global_instance_manager(
-    instance_factory: Callable[[], _T] | None = None, instance: _T | None = None
-) -> Callable[[], Generator[_T, None, None]]:
+def _global_instance_manager(instance: OpenJTalk | None) -> Callable[[], Generator[OpenJTalk, None, None]]:
     """Generate an instance manager, which enable singleton-like global instance."""
-    if instance_factory is None and instance is None:
-        msg = "Either instance_factory or instance should be not None."
-        raise RuntimeError(msg)
-
     _instance = instance
     mutex = Lock()
 
     @contextmanager
-    def manager() -> Generator[_T, None, None]:
+    def manager() -> Generator[OpenJTalk, None, None]:
         nonlocal _instance
         with mutex:
             if _instance is None:
-                _instance = instance_factory()
+                if not Path(str(OPEN_JTALK_DICT_DIR)).exists():
+                    _extract_dic()
+                _instance = OpenJTalk(dn_mecab=OPEN_JTALK_DICT_DIR)
             yield _instance
 
     return manager
 
 
-def _jtalk_factory() -> OpenJTalk:
-    """Generate new OpenJTalk instance with the dictionary."""
-    _lazy_init()
-    return OpenJTalk(dn_mecab=OPEN_JTALK_DICT_DIR)
-
-
 # Global instance of OpenJTalk
-_global_jtalk = _global_instance_manager(_jtalk_factory)
+_global_jtalk = _global_instance_manager(None)
 
 
 class OjtNjdFeature(TypedDict):
@@ -190,7 +171,7 @@ def update_global_jtalk_with_user_dict(path: str) -> None:
             msg = f"no such file or directory: {path}"
             raise FileNotFoundError(msg)
         _global_jtalk = _global_instance_manager(
-            instance=OpenJTalk(
+            OpenJTalk(
                 dn_mecab=OPEN_JTALK_DICT_DIR, userdic=path.encode("utf-8")
             )
         )
