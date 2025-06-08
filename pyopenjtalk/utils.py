@@ -1,12 +1,15 @@
+"""Utilities."""
+
+
 def merge_njd_marine_features(njd_features, marine_results):
+    """Merge Open JTalk NJD features with MARINE features."""
     features = []
 
     marine_accs = marine_results["accent_status"]
     marine_chain_flags = marine_results["accent_phrase_boundary"]
 
-    assert (
-        len(njd_features) == len(marine_accs) == len(marine_chain_flags)
-    ), "Invalid sequence sizes in njd_results, marine_results"
+    msg = "Invalid sequence sizes in njd_results, marine_results"
+    assert len(njd_features) == len(marine_accs) == len(marine_chain_flags), msg
 
     for node_index, njd_feature in enumerate(njd_features):
         _feature = {}

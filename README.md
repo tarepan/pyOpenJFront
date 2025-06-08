@@ -121,14 +121,20 @@ To build the package locally, you will need to make sure to clone open_jtalk.
 git submodule update --recursive --init
 ```
 
-### Build
-```
-pip install -e .
+### Check
+```bash
+## 一括でチェックと可能な範囲の自動修正をおこなう
+ruff check --fix && ruff format && pytest
 ```
 
 ### Test
-```
+```bash
 pytest
+```
+
+### Build
+```bash
+pip install -e .
 ```
 
 ## Differences from pyopenjtalk

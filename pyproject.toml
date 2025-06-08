@@ -87,3 +87,35 @@ line_length = 88
 py_version = "py38"
 [[tool.pysen.lint.mypy_targets]]
   paths = ["."]
+
+[tool.ruff]
+extend-exclude = [
+  "docs/conf.py", # Because this file is python-like non-standalone config.
+  "pyopenjtalk/utils.py", # Supress until deletion
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "E501", # line-too-long
+  "COM812", # missing-trailing-comma. Because of linter-formatter conflict.
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/test_*.py" = [
+  "D103", # undocumented-public-function. Because D103 force docstring on pytest target functions `test_*()` even if contents are apparent from name.
+  "RUF001", # ambiguous-unicode-character-string. Test Japanese strings.
+  "RUF002", # ambiguous-unicode-character-docstring. Test Japanese strings.
+  "RUF003", # ambiguous-unicode-character-comment. Test Japanese strings.
+  "S101", # assert. Assert is recommended in pytest.
+]
+"setup.py" = [
+  "S603", # subprocess-without-shell-equals-true. Because of internal use for build.
+  "S607", # start-process-with-partial-path. Because of internal use for build.
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.format]
+docstring-code-format = true

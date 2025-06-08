@@ -1,34 +1,34 @@
 """pyopenjtalk."""
 
-from __future__ import annotations
-
 import atexit
+import logging
 import os
-import sys
 import tarfile
 import tempfile
 from collections.abc import Callable, Generator
 from contextlib import ExitStack, contextmanager
-from os.path import exists
-from threading import Lock
-from typing import TypeVar, TypedDict
-
-from urllib.request import urlopen
 from importlib.resources import as_file, files
+from pathlib import Path
+from threading import Lock
+from typing import TypedDict, TypeVar
+from urllib.request import urlopen
 
 try:
-    from .version import __version__  # NOQA
-except ImportError:
-    raise ImportError("BUG: version.py doesn't exist. Please file a bug report.")
+    from .version import __version__  # noqa: F401, false-positive
+except ImportError as e:
+    msg = "BUG: version.py doesn't exist. Please file a bug report."
+    raise ImportError(msg) from e
 
 from .openjtalk import OpenJTalk
 from .openjtalk import mecab_dict_index as _mecab_dict_index
 from .utils import merge_njd_marine_features
 
+logger = logging.getLogger(__name__)
+
 _file_manager = ExitStack()
 atexit.register(_file_manager.close)
 
-_pyopenjtalk_ref = files(__name__) # NOTE: package directory
+_pyopenjtalk_ref = files(__name__)  # NOTE: package directory
 _dic_dir_name = "open_jtalk_dic_utf_8-1.11"
 
 # dictionary path. Env `OPEN_JTALK_DICT_DIR` or the package directory.
@@ -43,22 +43,23 @@ def _extract_dic() -> None:
     """Download and extract the dictionary under the package."""
     from tqdm.auto import tqdm
 
-    global OPEN_JTALK_DICT_DIR
+    global OPEN_JTALK_DICT_DIR  # noqa: PLW0603, demerit is accepted.
     pyopenjtalk_dir = _file_manager.enter_context(as_file(_pyopenjtalk_ref))
 
     # Download and extract the dictionary file
     with tempfile.TemporaryFile() as t:
-        print(f'Downloading: "{_DICT_URL}"')
-        with urlopen(_DICT_URL) as response:
+        msg = f'Downloading: "{_DICT_URL}"'
+        logger.info(msg)
+        with urlopen(_DICT_URL) as response:  # noqa: S310,SIM117, trusted URL, false-positive
             with tqdm.wrapattr(
                 t, "write", total=getattr(response, "length", None)
             ) as tar:
                 for chunk in response:
                     tar.write(chunk)
         t.seek(0)
-        print("Extracting tar file")
+        logger.info("Extracting tar file")
         with tarfile.open(mode="r|gz", fileobj=t) as f:
-            f.extractall(path=pyopenjtalk_dir)
+            f.extractall(path=pyopenjtalk_dir)  # noqa: S202, trusted archive file
 
     # Update the dictionary path
     OPEN_JTALK_DICT_DIR = str(pyopenjtalk_dir / _dic_dir_name).encode("utf-8")
@@ -66,7 +67,7 @@ def _extract_dic() -> None:
 
 def _lazy_init() -> None:
     """Prepare the dictionary."""
-    if not exists(OPEN_JTALK_DICT_DIR):
+    if not Path(str(OPEN_JTALK_DICT_DIR)).exists():
         _extract_dic()
 
 
@@ -77,8 +78,9 @@ def _global_instance_manager(
     instance_factory: Callable[[], _T] | None = None, instance: _T | None = None
 ) -> Callable[[], Generator[_T, None, None]]:
     """Generate an instance manager, which enable singleton-like global instance."""
-    # Needs either instance_factory or instance
-    assert instance_factory is not None or instance is not None
+    if instance_factory is None and instance is None:
+        msg = "Either instance_factory or instance should be not None."
+        raise RuntimeError(msg)
 
     _instance = instance
     mutex = Lock()
@@ -100,12 +102,13 @@ def _jtalk_factory() -> OpenJTalk:
     return OpenJTalk(dn_mecab=OPEN_JTALK_DICT_DIR)
 
 
-def _marine_factory():
+def _marine_factory():  # noqa: ANN202, because of conditional import.
     """Generate new MARINE instance."""
     try:
         from marine.predict import Predictor
-    except ImportError:
-        raise ImportError("Please install marine by `pip install pyopenjtalk[marine]`")
+    except ImportError as e:
+        msg = "Please install marine by `pip install pyopenjtalk[marine]`"
+        raise ImportError(msg) from e
     return Predictor()
 
 
@@ -134,21 +137,36 @@ class OjtNjdFeature(TypedDict):
     chain_flag: int
 
 
-def g2p(text: str, kana: bool = False, join: bool = True) -> str | list[str]:
+def g2p(text: str, *, kana: bool = False, join: bool = True) -> str | list[str]:
     """Grapheme-to-phoeneme (G2P) conversion.
 
     This is just a convenient wrapper around `run_frontend`.
 
-    Args:
+    Parameters
+    ----------
         text: Unicode Japanese text.
         kana: If True, returns the pronunciation in katakana, otherwise in phone.
         join: If True, concatenate phones or katakana's into a single string.
 
-    Returns:
+    Returns
+    -------
         G2P results. Joined string or list of symbols.
     """
     with _global_jtalk() as jtalk:
         return jtalk.g2p(text, kana=kana, join=join)
+
+
+class MarineFeature(TypedDict):
+    """MARINE feature."""
+
+    surface: str
+    pos: str  # pos + pos_group1 + pos_group2 + pos_group3
+    pron: str | None
+    c_type: str
+    c_form: str
+    accent_type: int
+    accent_con_type: str  # chain rule
+    chain_flag: str
 
 
 def estimate_accent(njd_features: list[OjtNjdFeature]) -> list[OjtNjdFeature]:
@@ -156,38 +174,42 @@ def estimate_accent(njd_features: list[OjtNjdFeature]) -> list[OjtNjdFeature]:
 
     This function requires marine (https://github.com/6gsn/marine)
 
-    Args:
+    Parameters
+    ----------
         njd_result (list): features generated by OpenJTalk.
 
-    Returns:
+    Returns
+    -------
         list: features for NJDNode with estimation results by marine.
     """
     with _global_marine() as marine:
         from marine.utils.openjtalk_util import convert_njd_feature_to_marine_feature
 
-        marine_feature = convert_njd_feature_to_marine_feature(njd_features)
-        marine_results = marine.predict(
-            [marine_feature], require_open_jtalk_format=True
+        marine_features: list[MarineFeature] = convert_njd_feature_to_marine_feature(
+            njd_features
         )
-    njd_features = merge_njd_marine_features(njd_features, marine_results)
-    return njd_features
+        marine_results = marine.predict(
+            [marine_features], require_open_jtalk_format=True
+        )
+    return merge_njd_marine_features(njd_features, marine_results)
 
 
-def run_frontend(text: str, run_marine: bool = False) -> list[OjtNjdFeature]:
+def run_frontend(text: str, *, run_marine: bool = False) -> list[OjtNjdFeature]:
     """Run OpenJTalk's text processing frontend.
 
-    Args:
+    Parameters
+    ----------
         text: Unicode Japanese text.
         run_marine: Whether to estimate accent using marine.
           When use, need to install marine by `pip install pyopenjtalk[marine]`.
 
-    Returns:
+    Returns
+    -------
         features for NJDNode.
     """
     with _global_jtalk() as jtalk:
         njd_features = jtalk.run_frontend(text)
     if run_marine:
-        # TODO: Test here
         njd_features = estimate_accent(njd_features)
     return njd_features
 
@@ -195,13 +217,15 @@ def run_frontend(text: str, run_marine: bool = False) -> list[OjtNjdFeature]:
 def mecab_dict_index(path: str, out_path: str, dn_mecab: str | None = None) -> None:
     """Create user dictionary.
 
-    Args:
+    Parameters
+    ----------
         path: path to user csv
         out_path: path to output dictionary
         dn_mecab: path to mecab dictionary
     """
-    if not exists(path):
-        raise FileNotFoundError(f"no such file or directory: {path}")
+    if not Path(path).exists():
+        msg = f"no such file or directory: {path}"
+        raise FileNotFoundError(msg)
 
     if dn_mecab is None:
         # NOTE: Prepare the dictionary through `_lazy_init()` call
@@ -212,7 +236,8 @@ def mecab_dict_index(path: str, out_path: str, dn_mecab: str | None = None) -> N
     r = _mecab_dict_index(dn_mecab, path.encode("utf-8"), out_path.encode("utf-8"))
     # NOTE: mecab load returns 1 if success, but mecab_dict_index return the opposite
     if r != 0:
-        raise RuntimeError("Failed to create user dictionary")
+        msg = "Failed to create user dictionary"
+        raise RuntimeError(msg)
 
 
 def update_global_jtalk_with_user_dict(path: str) -> None:
@@ -220,13 +245,15 @@ def update_global_jtalk_with_user_dict(path: str) -> None:
 
     Note that this will change the global state of the openjtalk module.
 
-    Args:
+    Parameters
+    ----------
         path: path to user dictionary
     """
-    global _global_jtalk
+    global _global_jtalk  # noqa: PLW0603, demerit is accepted.
     with _global_jtalk():
-        if not exists(path):
-            raise FileNotFoundError(f"no such file or directory: {path}")
+        if not Path(path).exists():
+            msg = f"no such file or directory: {path}"
+            raise FileNotFoundError(msg)
         _global_jtalk = _global_instance_manager(
             instance=OpenJTalk(
                 dn_mecab=OPEN_JTALK_DICT_DIR, userdic=path.encode("utf-8")

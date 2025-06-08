@@ -1,111 +1,112 @@
+"""Build workflow."""
+
+import logging
 import os
 import subprocess
 import sys
-from glob import glob
 from itertools import chain
-from os.path import exists, join
+from pathlib import Path
+from typing import Final
 
 import setuptools.command.build_ext
 from setuptools import Extension, setup
 
+logger = logging.getLogger(__name__)
+
 platform_is_windows = sys.platform == "win32"
 
-msvc_extra_compile_args_config = [
+msvc_extra_compile_args_config: Final = [
     "/source-charset:utf-8",
     "/execution-charset:utf-8",
 ]
 
 
-def msvc_extra_compile_args(compile_args):
+def _msvc_extra_compile_args(compile_args: list[str]) -> list[str]:
     cas = set(compile_args)
     xs = filter(lambda x: x not in cas, msvc_extra_compile_args_config)
     return list(chain(compile_args, xs))
 
 
-msvc_define_macros_config = [
+msvc_define_macros_config: Final = [
     ("_CRT_NONSTDC_NO_WARNINGS", None),
     ("_CRT_SECURE_NO_WARNINGS", None),
 ]
 
 
-def msvc_define_macros(macros):
-    mns = set([i[0] for i in macros])
+def _msvc_define_macros(
+    macros: list[tuple[str, str | None]],
+) -> list[tuple[str, str | None]]:
+    mns = set([i[0] for i in macros])  # noqa: C403, false-positive?
     xs = filter(lambda x: x[0] not in mns, msvc_define_macros_config)
     return list(chain(macros, xs))
 
 
-class custom_build_ext(setuptools.command.build_ext.build_ext):
-    def build_extensions(self):
+class custom_build_ext(setuptools.command.build_ext.build_ext):  # noqa: N801
+    """Custom `build_ext`."""
+
+    def build_extensions(self) -> None:
+        """build_extensions."""
         compiler_type_is_msvc = self.compiler.compiler_type == "msvc"
         for entry in self.extensions:
             if compiler_type_is_msvc:
-                entry.extra_compile_args = msvc_extra_compile_args(
+                entry.extra_compile_args = _msvc_extra_compile_args(
                     entry.extra_compile_args
                     if hasattr(entry, "extra_compile_args")
                     else []
                 )
-                entry.define_macros = msvc_define_macros(
+                entry.define_macros = _msvc_define_macros(
                     entry.define_macros if hasattr(entry, "define_macros") else []
                 )
 
         setuptools.command.build_ext.build_ext.build_extensions(self)
 
 
-def check_cmake_in_path():
+def _check_cmake_in_path() -> tuple[True, str] | tuple[False, None]:
     try:
         result = subprocess.run(
-            ["cmake", "--version"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
+            ["cmake", "--version"], capture_output=True, text=True, check=False
         )
         if result.returncode == 0:
             # CMake is in the system path
             return True, result.stdout.strip()
-        else:
-            # CMake is not in the system path
-            return False, None
     except FileNotFoundError:
         # CMake command not found
+        return False, None
+    else:
+        # CMake is not in the system path
         return False, None
 
 
 if os.name == "nt":  # Check if the OS is Windows
     # Check if CMake is in the system path
-    cmake_found, cmake_version = check_cmake_in_path()
+    cmake_found, cmake_version = _check_cmake_in_path()
 
     if cmake_found:
-        print(
-            f"CMake is in the system path. Version: \
-              {cmake_version}"
-        )
+        msg = f"CMake is in the system path. Version: {cmake_version}"
+        logger.info(msg)
     else:
-        raise SystemError(
-            "CMake is not found in the \
-                          system path. Make sure CMake \
-                          is installed and in the system \
-                          path."
-        )
+        msg = "CMake is not found in the system path. Make sure CMake is installed and in the system path."
+        raise SystemError(msg)
 
 # open_jtalk sources
-src_top = join("lib", "open_jtalk", "src")
+src_top = Path("lib") / "open_jtalk" / "src"
 
 # generate config.h for mecab
 # NOTE: need to run cmake to generate config.h
 # we could do it on python side but it would be very tricky,
 # so far let's use cmake tool
-if not exists(join(src_top, "mecab", "src", "config.h")):
-    cwd = os.getcwd()
-    build_dir = join(src_top, "build")
-    os.makedirs(build_dir, exist_ok=True)
-    os.chdir(build_dir)
+if not (src_top / "mecab" / "src" / "config.h").exists():
+    cwd = Path.getcwd()
+    build_dir = src_top / "build"
+    build_dir.mkdir(parents=True, exist_ok=True)
+    os.chdir(str(build_dir))
 
-    r = subprocess.run(["cmake", ".."])
+    r = subprocess.run(["cmake", ".."], check=False)
     r.check_returncode()
     os.chdir(cwd)
 
-all_src = []
-include_dirs = []
+all_src: list[str] = []
+include_dirs: list[str] = []
 for s in [
     "jpcommon",
     "mecab/src",
@@ -120,15 +121,15 @@ for s in [
     "njd_set_unvoiced_vowel",
     "text2mecab",
 ]:
-    all_src += glob(join(src_top, s, "*.c"))
-    all_src += glob(join(src_top, s, "*.cpp"))
-    include_dirs.append(join(os.getcwd(), src_top, s))
+    all_src += list(map(str, (src_top / s).glob("*.c")))
+    all_src += list(map(str, (src_top / s).glob("*.cpp")))
+    include_dirs.append(str(Path.cwd() / src_top / s))
 
 # Extension for OpenJTalk frontend
 ext_modules = [
     Extension(
         name="pyopenjtalk.openjtalk",
-        sources=[join("pyopenjtalk", "openjtalk.pyx")] + all_src,
+        sources=[str(Path("pyopenjtalk") / "openjtalk.pyx"), *all_src],
         include_dirs=include_dirs,
         extra_compile_args=[],
         extra_link_args=[],
