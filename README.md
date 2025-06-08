@@ -141,6 +141,7 @@ If you want to use [MARINE](https://github.com/6gsn/marine) for accent refinemen
 New features are listed below:
 
 - Full type hints
+- Cython 3.x
 - Modern checkers (mypy + Ruff + typos + pytest)
 
 If you needs more-rich-feature pyopenjtalk, [`pyopenjtalk-plus`](https://github.com/tsukumijima/pyopenjtalk-plus) will help you 😉

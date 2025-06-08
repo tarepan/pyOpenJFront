@@ -2,7 +2,7 @@
 requires = [
     "setuptools>=64",
     "setuptools_scm>=8",
-    "cython>=0.29.16",
+    "cython>=3.1.0",
     "cmake",
 ]
 build-backend = "setuptools.build_meta"
@@ -38,7 +38,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "cython>=0.29.16",
+    "cython>=3.1.0",
     "mypy>=1.16.0",
     "types-tqdm",
     "types-setuptools", # Needed for setup.py

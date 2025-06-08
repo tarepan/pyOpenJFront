@@ -1,5 +1,4 @@
 # distutils: language = c++
-# cython: language_level=3
 
 from .jpcommon cimport JPCommon
 from .njd cimport NJD
