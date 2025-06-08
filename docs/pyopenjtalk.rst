@@ -22,4 +22,3 @@ Misc
 ----
 
 .. autofunction:: run_frontend
-.. autofunction:: estimate_accent

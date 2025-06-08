@@ -59,7 +59,6 @@ dev = [
     "importlib-metadata<5.0",
 ]
 test = ["pytest"]
-marine = ["marine>=0.0.5"]
 
 [tool.setuptools.packages.find]
 include = ["pyopenjtalk*"]
@@ -91,7 +90,6 @@ py_version = "py38"
 [tool.ruff]
 extend-exclude = [
   "docs/conf.py", # Because this file is python-like non-standalone config.
-  "pyopenjtalk/utils.py", # Supress until deletion
 ]
 
 [tool.ruff.lint]
