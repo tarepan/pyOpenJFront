@@ -30,7 +30,7 @@ before_install:
   - cd $TRAVIS_BUILD_DIR
 
 install:
-  - pip install -e ".[test,docs]"
+  - pip install -e ".[dev,docs]"
 
 script:
   - pytest -v -s

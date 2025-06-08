@@ -48,11 +48,10 @@ docs = [
 dev = [
     "cython>=0.29.16",
     "mypy>=1.16.0",
-    "types-setuptools",
     "types-tqdm",
-    "importlib-metadata<5.0",
+    "types-setuptools", # Needed for setup.py
+    "pytest",
 ]
-test = ["pytest"]
 
 [tool.setuptools.packages.find]
 include = ["pyopenjtalk*"]
