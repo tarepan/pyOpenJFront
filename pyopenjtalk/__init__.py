@@ -1,3 +1,5 @@
+"""pyopenjtalk."""
+
 from __future__ import annotations
 
 import atexit
@@ -29,26 +31,27 @@ from .utils import merge_njd_marine_features
 _file_manager = ExitStack()
 atexit.register(_file_manager.close)
 
-_pyopenjtalk_ref = files(__name__)
+_pyopenjtalk_ref = files(__name__) # NOTE: package directory
 _dic_dir_name = "open_jtalk_dic_utf_8-1.11"
 
-# Dictionary directory
-# defaults to the package directory where the dictionary will be automatically downloaded
+# dictionary path. Env `OPEN_JTALK_DICT_DIR` or the package directory.
 OPEN_JTALK_DICT_DIR = os.environ.get(
     "OPEN_JTALK_DICT_DIR",
     str(_file_manager.enter_context(as_file(_pyopenjtalk_ref / _dic_dir_name))),
 ).encode("utf-8")
-_dict_download_url = "https://github.com/r9y9/open_jtalk/releases/download/v1.11.1"
-_DICT_URL = f"{_dict_download_url}/open_jtalk_dic_utf_8-1.11.tar.gz"
+_DICT_URL = "https://github.com/r9y9/open_jtalk/releases/download/v1.11.1/open_jtalk_dic_utf_8-1.11.tar.gz"
 
 
-def _extract_dic():
+def _extract_dic() -> None:
+    """Download and extract the dictionary under the package."""
     from tqdm.auto import tqdm
 
     global OPEN_JTALK_DICT_DIR
     pyopenjtalk_dir = _file_manager.enter_context(as_file(_pyopenjtalk_ref))
+
+    # Download and extract the dictionary file
     with tempfile.TemporaryFile() as t:
-        print('Downloading: "{}"'.format(_DICT_URL))
+        print(f'Downloading: "{_DICT_URL}"')
         with urlopen(_DICT_URL) as response:
             with tqdm.wrapattr(
                 t, "write", total=getattr(response, "length", None)
@@ -59,10 +62,13 @@ def _extract_dic():
         print("Extracting tar file")
         with tarfile.open(mode="r|gz", fileobj=t) as f:
             f.extractall(path=pyopenjtalk_dir)
+
+    # Update the dictionary path
     OPEN_JTALK_DICT_DIR = str(pyopenjtalk_dir / _dic_dir_name).encode("utf-8")
 
 
-def _lazy_init():
+def _lazy_init() -> None:
+    """Prepare the dictionary."""
     if not exists(OPEN_JTALK_DICT_DIR):
         _extract_dic()
 
@@ -73,7 +79,10 @@ _T = TypeVar("_T")
 def _global_instance_manager(
     instance_factory: Callable[[], _T] | None = None, instance: _T | None = None
 ) -> Callable[[], Generator[_T, None, None]]:
+    """Generate an instance manager, which enable singleton-like global instance."""
+    # Needs either instance_factory or instance
     assert instance_factory is not None or instance is not None
+
     _instance = instance
     mutex = Lock()
 
@@ -89,11 +98,13 @@ def _global_instance_manager(
 
 
 def _jtalk_factory() -> OpenJTalk:
+    """Generate new OpenJTalk instance with the dictionary."""
     _lazy_init()
     return OpenJTalk(dn_mecab=OPEN_JTALK_DICT_DIR)
 
 
 def _marine_factory():
+    """Generate new MARINE instance."""
     try:
         from marine.predict import Predictor
     except ImportError:
@@ -107,8 +118,8 @@ _global_jtalk = _global_instance_manager(_jtalk_factory)
 _global_marine = _global_instance_manager(_marine_factory)
 
 
-def g2p(*args, **kwargs):
-    """Grapheme-to-phoeneme (G2P) conversion
+def g2p(*args, **kwargs) -> str | list[str]:
+    """Grapheme-to-phoeneme (G2P) conversion.
 
     This is just a convenient wrapper around `run_frontend`.
 
@@ -120,14 +131,14 @@ def g2p(*args, **kwargs):
           Default is True.
 
     Returns:
-        str or list: G2P result in 1) str if join is True 2) list if join is False.
+        G2P results. Joined string or list of symbols.
     """
     with _global_jtalk() as jtalk:
         return jtalk.g2p(*args, **kwargs)
 
 
 def estimate_accent(njd_features):
-    """Accent estimation using marine
+    """Accent estimation using marine.
 
     This function requires marine (https://github.com/6gsn/marine)
 
@@ -149,7 +160,7 @@ def estimate_accent(njd_features):
 
 
 def run_frontend(text: str, run_marine: bool = False):
-    """Run OpenJTalk's text processing frontend
+    """Run OpenJTalk's text processing frontend.
 
     Args:
         text: Unicode Japanese text.
@@ -167,40 +178,41 @@ def run_frontend(text: str, run_marine: bool = False):
     return njd_features
 
 
-def mecab_dict_index(path, out_path, dn_mecab=None):
-    """Create user dictionary
+def mecab_dict_index(path: str, out_path: str, dn_mecab: str | None = None) -> None:
+    """Create user dictionary.
 
     Args:
-        path (str): path to user csv
-        out_path (str): path to output dictionary
-        dn_mecab (optional. str): path to mecab dictionary
+        path: path to user csv
+        out_path: path to output dictionary
+        dn_mecab: path to mecab dictionary
     """
     if not exists(path):
-        raise FileNotFoundError("no such file or directory: %s" % path)
+        raise FileNotFoundError(f"no such file or directory: {path}")
+
     if dn_mecab is None:
-        with _global_jtalk():  # call _lazy_init()
+        # NOTE: Prepare the dictionary through `_lazy_init()` call
+        with _global_jtalk():
             pass
         dn_mecab = OPEN_JTALK_DICT_DIR
-    r = _mecab_dict_index(dn_mecab, path.encode("utf-8"), out_path.encode("utf-8"))
 
+    r = _mecab_dict_index(dn_mecab, path.encode("utf-8"), out_path.encode("utf-8"))
     # NOTE: mecab load returns 1 if success, but mecab_dict_index return the opposite
-    # yeah it's confusing...
     if r != 0:
         raise RuntimeError("Failed to create user dictionary")
 
 
-def update_global_jtalk_with_user_dict(path):
-    """Update global openjtalk instance with the user dictionary
+def update_global_jtalk_with_user_dict(path: str) -> None:
+    """Update global openjtalk instance with the user dictionary.
 
     Note that this will change the global state of the openjtalk module.
 
     Args:
-        path (str): path to user dictionary
+        path: path to user dictionary
     """
     global _global_jtalk
     with _global_jtalk():
         if not exists(path):
-            raise FileNotFoundError("no such file or directory: %s" % path)
+            raise FileNotFoundError(f"no such file or directory: {path}")
         _global_jtalk = _global_instance_manager(
             instance=OpenJTalk(
                 dn_mecab=OPEN_JTALK_DICT_DIR, userdic=path.encode("utf-8")
