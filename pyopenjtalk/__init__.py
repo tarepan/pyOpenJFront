@@ -167,17 +167,23 @@ def extract_fullcontext(text, run_marine=False):
     return make_label(njd_features)
 
 
-def run_frontend(text):
+def run_frontend(text: str, run_marine: bool = False):
     """Run OpenJTalk's text processing frontend
 
     Args:
-        text (str): Unicode Japanese text.
+        text: Unicode Japanese text.
+        run_marine: Whether to estimate accent using marine.
+          When use, need to install marine by `pip install pyopenjtalk[marine]`.
 
     Returns:
         list: features for NJDNode.
     """
     with _global_jtalk() as jtalk:
-        return jtalk.run_frontend(text)
+        njd_features = jtalk.run_frontend(text)
+    if run_marine:
+        # TODO: Test here
+        njd_features = estimate_accent(njd_features)
+    return njd_features
 
 
 def make_label(njd_features):
