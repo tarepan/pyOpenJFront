@@ -49,7 +49,6 @@ dev = [
     "cython>=0.29.16",
     "mypy>=1.16.0",
     "types-setuptools",
-    "types-decorator",
     "types-tqdm",
     "importlib-metadata<5.0",
 ]
@@ -101,3 +100,7 @@ docstring-code-format = true
 
 [tool.mypy]
 strict = true
+exclude = [
+  "build",
+  "docs/conf.py", # Because this file is python-like non-standalone config.
+]

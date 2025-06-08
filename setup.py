@@ -96,7 +96,7 @@ src_top = Path("lib") / "open_jtalk" / "src"
 # we could do it on python side but it would be very tricky,
 # so far let's use cmake tool
 if not (src_top / "mecab" / "src" / "config.h").exists():
-    cwd = Path.getcwd()
+    cwd = Path.cwd()
     build_dir = src_top / "build"
     build_dir.mkdir(parents=True, exist_ok=True)
     os.chdir(str(build_dir))
