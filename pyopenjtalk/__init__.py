@@ -64,7 +64,9 @@ def _extract_dic() -> None:
     OPEN_JTALK_DICT_DIR = str(pyopenjtalk_dir / _dic_dir_name).encode("utf-8")
 
 
-def _global_instance_manager(instance: OpenJTalk | None) -> Callable[[], Generator[OpenJTalk, None, None]]:
+def _global_instance_manager(
+    instance: OpenJTalk | None,
+) -> Callable[[], Generator[OpenJTalk, None, None]]:
     """Generate an instance manager, which enable singleton-like global instance."""
     _instance = instance
     mutex = Lock()
@@ -171,7 +173,5 @@ def update_global_jtalk_with_user_dict(path: str) -> None:
             msg = f"no such file or directory: {path}"
             raise FileNotFoundError(msg)
         _global_jtalk = _global_instance_manager(
-            OpenJTalk(
-                dn_mecab=OPEN_JTALK_DICT_DIR, userdic=path.encode("utf-8")
-            )
+            OpenJTalk(dn_mecab=OPEN_JTALK_DICT_DIR, userdic=path.encode("utf-8"))
         )

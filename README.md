@@ -106,11 +106,6 @@ git submodule update --recursive --init
 ruff check --fix && ruff format && pytest
 ```
 
-### Test
-```bash
-pytest
-```
-
 ### Build
 ```bash
 pip install -e .

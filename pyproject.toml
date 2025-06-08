@@ -47,14 +47,8 @@ docs = [
 ]
 dev = [
     "cython>=0.29.16",
-    "pysen",
     "types-setuptools",
     "mypy<=0.910",
-    "black>=19.19b0,<=20.8",
-    "click<8.1.0",
-    "flake8>=3.7,<4",
-    "flake8-bugbear",
-    "isort>=4.3,<5.2.0",
     "types-decorator",
     "importlib-metadata<5.0",
 ]
@@ -72,20 +66,6 @@ version_file_template = '''
 __version__ = "{version}"
 '''
 # local_scheme = "no-local-version"
-
-[tool.pysen]
-version = "0.10.2"
-
-[tool.pysen.lint]
-enable_black = true
-enable_flake8 = true
-enable_isort = true
-enable_mypy = false # TODO: enable mypy in the future
-mypy_preset = "strict"
-line_length = 88
-py_version = "py38"
-[[tool.pysen.lint.mypy_targets]]
-  paths = ["."]
 
 [tool.ruff]
 extend-exclude = [
