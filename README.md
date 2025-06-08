@@ -44,9 +44,7 @@ and then run
 pip install -e .
 ```
 
-## Quick demo
-
-Please check the notebook version [here (nbviewer)](https://nbviewer.jupyter.org/github/r9y9/pyopenjtalk/blob/master/docs/notebooks/Demo.ipynb).
+## How to Use
 
 ### Run text processing frontend only
 
