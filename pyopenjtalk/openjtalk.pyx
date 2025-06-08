@@ -162,7 +162,7 @@ cdef class OpenJTalk:
     """OpenJTalk
 
     Args:
-        dn_mecab (bytes): Dictionaly path for MeCab.
+        dn_mecab (bytes): Dictionary path for MeCab.
         userdic (bytes): Dictionary path for MeCab userdic.
             This option is ignored when empty bytestring is given.
             Default is empty.
@@ -188,7 +188,7 @@ cdef class OpenJTalk:
             r = self._load(_dn_mecab, _userdic)
             if r != 1:
                 self._clear()
-                raise RuntimeError("Failed to initalize Mecab")
+                raise RuntimeError("Failed to initialize Mecab")
 
     cdef void _clear(self) noexcept nogil:
         Mecab_clear(self.mecab)

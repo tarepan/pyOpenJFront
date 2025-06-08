@@ -87,7 +87,7 @@ HTS Working Group for their dedicated efforts to develop and maintain Open JTalk
 
 ## Development
 
-## Requirements
+### Requirements
 Following tools are needed for build:
 
 - C/C++ compilers
@@ -100,10 +100,22 @@ To build the package locally, you will need to make sure to clone open_jtalk.
 git submodule update --recursive --init
 ```
 
+### Installation
+```bash
+# Install dependencies
+pip install .[dev]
+
+# Install git hooks
+pre-commit install -t pre-push
+```
+
 ### Check
 ```bash
-## 一括でチェックと可能な範囲の自動修正をおこなう
-ruff check --fix && ruff format && pytest
+## Check at once
+mypy . && ruff check && ruff format --check && typos && pytest
+
+## Check and fix at once
+mypy . && ruff check --fix && ruff format && typos && pytest
 ```
 
 ### Build
@@ -126,8 +138,9 @@ Removed features are listed below:
 
 If you want to use [MARINE](https://github.com/6gsn/marine) for accent refinement, you can use it with `.run_frontend()` and custom parser (check [pyopenjtalk codes](https://github.com/r9y9/pyopenjtalk/blob/0f0fc44e782a8134cd9a51d80b57b48a7c95bb80/pyopenjtalk/__init__.py#L140-L159)).  
 
-New featues are listed below:
+New features are listed below:
 
 - Full type hints
+- Modern checkers (mypy + Ruff + typos + pytest)
 
 If you needs more-rich-feature pyopenjtalk, [`pyopenjtalk-plus`](https://github.com/tsukumijima/pyopenjtalk-plus) will help you 😉

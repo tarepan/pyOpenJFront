@@ -42,7 +42,10 @@ dev = [
     "mypy>=1.16.0",
     "types-tqdm",
     "types-setuptools", # Needed for setup.py
-    "pytest",
+    "ruff>=0.11.12",
+    "typos>=1.32.0",
+    "pytest>=8.3.5",
+    "pre-commit>=4.2.0",
 ]
 
 [tool.setuptools.packages.find]
