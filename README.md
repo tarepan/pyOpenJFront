@@ -77,9 +77,12 @@ Out[5]: 'g u n u u'
 - Windows (MSVC) (see [this PR](https://github.com/r9y9/pyopenjtalk/pull/13))
 
 ## LICENSE
+See [LICENSE.md](./LICENSE.md).  
 
-- pyopenjtalk: MIT license ([LICENSE.md](LICENSE.md))
-- Open JTalk: Modified BSD license ([COPYING](https://github.com/r9y9/open_jtalk/blob/1.10/src/COPYING))
+This repository is licensed derivative of below projects:
+
+- pyopenjtalk: © Ryuichi Yamamoto, licensed under MIT license ([original_LICENSE.md](./docs/original_LICENSE.md))
+- Open JTalk: © Nagoya Institute of Technology, licensed under Modified BSD license ([COPYING](https://github.com/r9y9/open_jtalk/blob/1.10/src/COPYING))
 
 ## Acknowledgements
 
