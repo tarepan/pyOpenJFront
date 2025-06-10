@@ -145,3 +145,32 @@ New features are listed below:
 - Modern checkers (mypy + Ruff + typos + pytest)
 
 If you needs more-rich-feature pyopenjtalk, [`pyopenjtalk-plus`](https://github.com/tsukumijima/pyopenjtalk-plus) will help you 😉
+
+
+## Motivation
+(private memo)  
+
+There are 3 main motivations of pyOpenJFront
+
+- Open JTalk is so strong
+- Open JTalk / pyopenjtalk has heavy technical debt
+- fullcontextlabel is not enough
+
+As a results, "keeping only OJT core functionality with modern stacks" came to my mind.  
+
+### Open JTalk is so strong
+Open JTalk released at 2009 (v1.00) / 2018 (v1.11), but its accent performance is still near-SoTA.  
+ML-based methods do not yet outperform rule-based OJT, especially in the sense of accent stability. Accent stability is critical for Japanese TTS naturalness.  
+In my impression, this situation will continue several years, especially in editable TTS.  
+Open JTalk is so strong.  
+
+### Open JTalk pyopenjtalk has heavy technical debt
+Open JTalk released at 2009 (v1.00) / 2018 (v1.11), and pyopenjtalk released at 2018.  
+In IT engineering, 10 years is so long. The ecosystem change totally.  
+If you hope to keep backward compatibility, you needs daily refactoring and OJT-specific heavy customs.  
+Open JTalk / pyopenjtalk has heavy technical debt.  
+
+### fullcontextlabel is not enough
+full-context label is too specialized to HTS.  
+In ML-era, more information is needed.  
+fullcontextlabel is not enough.
